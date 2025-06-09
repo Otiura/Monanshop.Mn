@@ -1,25 +1,38 @@
-# MonanShop.mn
+const express = require('express');
+const axios = require('axios');
+const { Configuration, OpenAIApi } = require('openai');
 
-Энэ бол Монгол хэл дээр бүтээгдсэн онлайн дэлгүүрийн вэбсайт юм. Tailwind CSS болон Next.js ашиглан бүтээсэн.
+const app = express();
+app.use(express.json();
 
-## 🚀 Гол боломжууд
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY
+});
+const openai = new OpenAIApi(configuration);
 
-- Dark / Light горим солигч
-- Барааны ангилал (Sneakers, Bomber, Подволк)
-- Захиалгын форм (`react-hook-form`)
-- Имэйлээр захиалга хүлээж авах (`EmailJS`)
-- Гар утсанд ээлтэй, responsive дизайн
+app.post('/webhook', async (req, res) => {
+  const userMessage = req.body.message;
 
-## ⚙️ Ашигласан технологи
+  const response = await openai.createChatCompletion({
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: userMessage }]
+  });
 
-- Next.js
-- Tailwind CSS
-- Axios
-- React Hook Form
-- EmailJS
+  const aiReply = response.data.choices[0].message.content;
 
-## 🛠 Хөгжүүлэлт
+  // Optionally: logic or memory operations here...
 
-```bash
-npm install
-npm run dev
+  // Send to ManyChat or other endpoint
+  await axios.post('https://api.manychat.com/v2/send', {
+    message: aiReply
+  }, {
+    headers: {
+      Authorization: `Bearer ${process.env.MANYCHAT_TOKEN}`
+    }
+  });
+
+  res.send({ reply: aiReply });
+});
+
+module.exports = app;
+
