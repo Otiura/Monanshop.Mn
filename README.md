@@ -167,5 +167,3 @@ export default function MonanStoreDemo() { return ( <div className="min-h-screen
 
 ); }
 
- 
-    
